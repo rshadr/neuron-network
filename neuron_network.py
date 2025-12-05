@@ -54,7 +54,7 @@ class NeuralNetwork:
     # output layer error is the (target - actual)
     output_errors = targets - final_outputs
     # hidden layer error is the output_errors, split by weights, recombined at
-    #  hiddem mpdes
+    #  hidden nodes
     hidden_errors = numpy.dot(self.who.T, output_errors)
 
     # update the weights for the links between the hidden and output layers
@@ -98,14 +98,15 @@ def train_mnist(n, output_nodes):
   # go through all the records in the training data set
   for record in training_data_list:
     # split the record by the ',' commas
-    all_values = record.split(',')
+    all_values = [int(x) for x in record.split(',')]
+    px_values = all_values[1:]
     # scale and shift the inputs
-    inputs = (numpy.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
+    inputs = (numpy.asarray(px_values, dtype=numpy.float64) * (1.0 / 255.0) * 0.99) + 0.01
     # create the target output values (all 0.01, except the desired label which
     #  is 0.99)
     targets = numpy.zeros(output_nodes) + 0.01
     # all_values[0] is the target label for this record
-    targets[int(all_values[0])] = 0.99
+    targets[all_values[0]] = 0.99
     n.train(inputs, targets)
     pass
 
@@ -124,12 +125,13 @@ def test_mnist(n):
   # go through all the records in the test data set
   for record in test_data_list:
     # split the record by the ',' commas
-    all_values = record.split(',')
+    all_values = [int(x) for x in record.split(',')]
+    px_values = all_values[1:]
     # correct answer is first value
-    correct_label = int(all_values[0])
+    correct_label = all_values[0]
     print(correct_label, "correct label")
     # scale and shift the inputs
-    inputs = (numpy.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
+    inputs = (numpy.asarray(px_values, dtype=numpy.float64) / 255.0 * 0.99) + 0.01
     # query the network
     outputs = n.query(inputs)
     # the index of the highest value corresponds to the label
